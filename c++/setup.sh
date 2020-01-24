@@ -1,8 +1,6 @@
-sudo apt install emacs
-sudo apt install clang-format
+sudo apt install emacs, clang, clang-format
 
 cat > ~/.clang-format <<EOF
- ---
 Language:        Cpp
 # BasedOnStyle:  Google
 AccessModifierOffset: -1
