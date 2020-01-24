@@ -1,3 +1,4 @@
+sudo apt install emacs
 sudo apt install clang-format
 
 cat > ~/.clang-format <<EOF
