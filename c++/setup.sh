@@ -116,10 +116,21 @@ EOF
 
 # create .emacs and add initial
 cat > ~/.emacs <<EOF
+;;; package --- Summary
+;;; Commentary:
+;;; Code:
+(package-initialize)
+
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+
 (package-initialize)
 (package-refresh-contents)
+
 EOF
 
 # all package you need
@@ -141,18 +152,18 @@ echo "y" | emacs --batch -u `whoami` --script package-list
 rm package-list
 
 # modify .emacs
-cat >> ~/.emacs <<EOF
+cat > ~/.emacs <<EOF
 ;;; package --- Summary
 ;;; Commentary:
 ;;; Code:
 (package-initialize)
 
-(require 'package)
-(add-to-list 'package-archives
-             '("elpy" . "https://jorgenschaefer.github.io/packages/"))
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")))
 
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
 
 ;; Uncomment this next line if you want line numbers on the left side
 (global-linum-mode 1)
