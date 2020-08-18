@@ -1,4 +1,5 @@
-sudo apt install emacs, clang, clang-format
+sudo apt install emacs
+sudo apt install clang-format
 
 cat > ~/.clang-format <<EOF
 Language:        Cpp
