@@ -2,12 +2,10 @@
 ;;; Commentary:
 ;;; Code:
 
-(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("melpa" . "https://melpa.org/packages/")))
-
 (require 'package)
 (require 'use-package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
 
 (package-initialize)
@@ -23,7 +21,7 @@
  '(dcoverage-pooly-covered-report-color "red")
  '(dcoverage-well-covered-report-color "green")
  '(package-selected-packages
-   '(auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
+   '(company-fuzzy company-shell company-go company auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -38,6 +36,14 @@
 ;; bind a keymap to the comment command (which can also used to uncomment)
 (global-set-key (kbd "C-x /") 'comment-line)
 (global-set-key (kbd "C-x a") 'align-regexp)
+;; always show parentheses matching color
+(show-paren-mode 1)
+
+;; enable company-mode in all buffers (company = complete anything)
+(add-hook 'after-init-hook 'global-company-mode)
+;; add filepath completion
+(eval-after-load 'company
+    '(push 'company-files company-backends))
 
 ;; configuration for Java development (start)
 
@@ -68,6 +74,18 @@
 (add-to-list 'auto-mode-alist '("\\.lex\\'" . sml-lex-mode))
 (add-to-list 'auto-mode-alist '("\\.yacc\\'" . sml-yacc-mode))
 (add-to-list 'auto-mode-alist '("\\.cm\\'" . sml-cm-mode))
+
+(define-derived-mode tiger-mode
+  c-mode "Tiger"
+  "Major mode for tiger (a simple language made for compiler learning)."
+  (setq-local comment-start "/*")
+  (setq-local comment-start-skip "/\\*+[ \t]*")
+  (setq-local comment-end "*/")
+  (setq-local comment-end-skip "[ \t]*\\*+/")
+  )
+
+(add-to-list 'auto-mode-alist '("\\.tig\\'" . tiger-mode))
+
 ;; configuration for sml-mode (end)
 
 ;; configuration for go-mode (start)
@@ -81,4 +99,3 @@
 	    ))
 
 ;; configuration for go-mode (end)
-
