@@ -21,7 +21,7 @@
  '(dcoverage-pooly-covered-report-color "red")
  '(dcoverage-well-covered-report-color "green")
  '(package-selected-packages
-   '(company-fuzzy company-shell company-go company auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
+   '(mips-mode flycheck company-fuzzy company-shell company-go company auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -36,15 +36,19 @@
 ;; bind a keymap to the comment command (which can also used to uncomment)
 (global-set-key (kbd "C-x /") 'comment-line)
 (global-set-key (kbd "C-x a") 'align-regexp)
+(global-set-key (kbd "C-x i") 'indent-region)
 ;; always show parentheses matching color
 (show-paren-mode 1)
 
 ;; enable company-mode in all buffers (company = complete anything)
 (add-hook 'after-init-hook 'global-company-mode)
+;; enable flycheck
+(add-hook 'after-init-hook #'global-flycheck-mode)
 ;; add filepath completion
 (eval-after-load 'company
     '(push 'company-files company-backends))
 
+(add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
 ;; configuration for Java development (start)
 
 (use-package elquery)
@@ -56,19 +60,29 @@
 (add-to-list 'auto-mode-alist '("\\.gradle\\'" . gradle-mode))
 ;; configuration for Java development (end)
 
+(add-to-list 'auto-mode-alist '("\\.\\(s\\|assm\\)\\'" . mips-mode))
+
 ;; configuration for sml-mode (start)
 
 (autoload 'sml-mode "sml-mode" "Major mode for editing SML." t)
 (autoload 'run-sml "sml-proc" "Run an inferior SML process." t)
 ;; make sml-mode automatically for .sml/.sig file
 (add-to-list 'auto-mode-alist '("\\.\\(sml\\|sig\\)\\'" . sml-mode))
- (defun my-sml-mode-hook () "Local defaults for SML mode"
+
+(defun my-sml-mode-hook () "Local defaults for SML mode"
        (setq sml-indent-level 2)        ; conserve on horizontal space
        (setq words-include-escape t)    ; \ loses word break status
        (setq indent-tabs-mode nil))     ; never ever indent with tabs
-     (add-hook 'sml-mode-hook 'my-sml-mode-hook)
 
+(add-hook 'sml-mode-hook 'my-sml-mode-hook)
 (add-hook 'sml-mode-hook 'turn-on-font-lock)
+
+(defun my-sml-mode-before-save-hook ()
+  (when (eq major-mode 'sml-mode)
+    (delete-trailing-whitespace)))
+
+(add-hook 'before-save-hook 'my-sml-mode-before-save-hook)
+
 (global-font-lock-mode 1)
 
 (add-to-list 'auto-mode-alist '("\\.lex\\'" . sml-lex-mode))
@@ -76,7 +90,7 @@
 (add-to-list 'auto-mode-alist '("\\.cm\\'" . sml-cm-mode))
 
 (define-derived-mode tiger-mode
-  c-mode "Tiger"
+  text-mode "Tiger"
   "Major mode for tiger (a simple language made for compiler learning)."
   (setq-local comment-start "/*")
   (setq-local comment-start-skip "/\\*+[ \t]*")
@@ -99,3 +113,21 @@
 	    ))
 
 ;; configuration for go-mode (end)
+
+;; Enable mouse support
+(unless window-system
+  (require 'mouse)
+  (xterm-mouse-mode t)
+  ;; enable mouse will disable mouse wheel scroll, this is a workaround
+  (global-set-key [mouse-4] 'scroll-down-line)
+  (global-set-key [mouse-5] 'scroll-up-line)
+  (defun track-mouse (e))
+  (setq mouse-sel-mode t)
+)
+
+;; copy content in emacs to clipboard
+(defun pbcopy ()
+  (interactive)
+  (call-process-region (point) (mark) "pbcopy")
+  (setq deactivate-mark t))
+(global-set-key (kbd "C-c c") 'pbcopy)
