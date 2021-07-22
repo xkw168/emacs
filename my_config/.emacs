@@ -1,12 +1,18 @@
 ;;; package --- Summary
 ;;; Commentary:
 ;;; Code:
+;;; useful links:
+;;; https://zhuanlan.zhihu.com/p/343924066
 
-(require 'package)
-(require 'use-package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/"))
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t) ; Org-mode's repository
+(setq package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "http://orgmode.org/elpa/")))
+
+;; if "use-package" is not installed, install it and enable it
+(unless (package-installed-p 'use-package)
+    (package-refresh-contents)
+    (package-install 'use-package)
+    (eval-when-compile (require 'use-package)))
 
 (package-initialize)
 
@@ -21,7 +27,7 @@
  '(dcoverage-pooly-covered-report-color "red")
  '(dcoverage-well-covered-report-color "green")
  '(package-selected-packages
-   '(mips-mode flycheck company-fuzzy company-shell company-go company auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
+   '(applescript-mode dumb-jump smartparens mips-mode flycheck company-fuzzy company-shell company-go company auto-complete popup-complete go-mode loc-changes gradle-mode load-relative clang-format markdown-mode rainbow-delimiters sml-mode elpy)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -31,7 +37,21 @@
  )
 
 ;; enable the rainbow-delimiters-mode for most programming mode
-(add-hook 'prog-mode-hook #'rainbow-delimiters-mode)
+(use-package rainbow-delimiters
+    :config
+    (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+;; enable smart parens
+(use-package smartparens
+    :config
+    (add-hook 'prog-mode-hook 'smartparens-mode))
+
+(use-package dumb-jump
+  ;; Attempts to jump to the definition for the thing under point
+  :bind (("C-M-g" . xref-find-definitions)
+	 ;; jumps back to where you were when you jumped
+         ("C-M-p" . xref-pop-marker-stack)
+	 ;; just like find-definitions but only show tooltip, not jump
+           ("C-M-q" . dumb-jump-quick-look)))
 
 ;; bind a keymap to the comment command (which can also used to uncomment)
 (global-set-key (kbd "C-x /") 'comment-line)
@@ -43,12 +63,13 @@
 ;; enable company-mode in all buffers (company = complete anything)
 (add-hook 'after-init-hook 'global-company-mode)
 ;; enable flycheck
-(add-hook 'after-init-hook #'global-flycheck-mode)
+(add-hook 'after-init-hook 'global-flycheck-mode)
 ;; add filepath completion
 (eval-after-load 'company
     '(push 'company-files company-backends))
 
 (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+(add-to-list 'auto-mode-alist '("\\.applescript\\'" . applescript-mode))
 ;; configuration for Java development (start)
 
 (use-package elquery)
